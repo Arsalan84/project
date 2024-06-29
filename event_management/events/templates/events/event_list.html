@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event List</title>
+  <style>
+    body {
+          font-family: 'Arial', sans-serif;
+          background-color: #f4f4f4;
+          margin: 0;
+          padding: 20px;
+}
+
+    h1 {
+          color: #333;
+}
+
+    a {
+          color: #0066cc;
+          text-decoration: none;
+}
+
+    a:hover {
+          text-decoration: underline;
+}
+
+    ul {
+          list-style-type: none;
+          padding: 0;
+}
+
+    li {
+          background-color: #fff;
+          border: 1px solid #ddd;
+          margin-bottom: 5px;
+          padding: 10px;
+}
+
+    li a {
+          display: block;
+          color: #333;
+}
+    p.no-events {
+          color: #777;
+}
+
+  </style>
+</head>
+<body>
+    <h1>Event List</h1>
+    <a href="{% url 'event_create' %}">Create Event</a>
+    {% if events %}
+        <ul>
+            {% for event in events %}
+                <li><a href="{% url 'event_detail' event.id %}">{{ event.title }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p> No events available at the at moment , Please check back later</p>
+    {% endif %}    
+</body>
+</html>

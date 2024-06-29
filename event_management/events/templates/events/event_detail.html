@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }}</title>
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        h2 {
+            margin-top: 20px;
+            color: #333;
+        }
+        p {
+            margin: 10px 0;
+        }
+        .task-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .incomplete {
+            color: #333;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        label {
+            display: block;
+            margin-top: 5px;
+        }
+        form {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            max-width: 300px;
+            margin: 20px 0;
+        }
+        form p {
+            margin: 10px 0;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .btn-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ event.title }}</h1>
+    <p>{{ event.description }}</p>
+    <p>Date: {{ event.date }}</p>
+    <p>Time: {{ event.time }}</p>
+    <p>Location: {{ event.location }}</p>
+
+    {% if is_owner %}
+        <a href="{% url 'task_create' event.id %}">Add Task</a>
+        
+        <h2>Send Task List to Manager</h2>
+        <form method="post" action="{% url 'send_task_list' event.id %}">
+            {% csrf_token %}
+            <label for="email">Manager's Email</label>
+            <input type="email" id="email" name="email" required>
+            <button type="submit">Send Tasks</button>
+        </form>
+
+        <h2>Tasks</h2>
+        {% for task in tasks %}
+            <p class="task-item {% if task.completed %}completed{% else %}incomplete{% endif %}">
+                <span>{{ task.description }}</span>
+                {% if is_owner %}
+                    <form action="{% url 'task_update' task.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <label>
+                            <input type="checkbox" name="completed" {% if task.completed %}checked{% endif %} onchange="this.form.submit()">
+                            Mark as {{ task.completed|yesno:"Completed,Incomplete" }}
+                        </label>
+                    </form>
+                {% endif %}
+            </p>
+        {% endfor %}
+
+        <!-- New button to view participants -->
+        <div class="btn-container">
+            <a href="{% url 'participant_list' event.id %}">
+                <button type="button">View Participants</button>
+            </a>
+        </div>
+    {% else %}
+        <h2>Register for Ticket</h2>
+        <form method="post" action="{% url 'participant_register' event.id %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Register</button>
+        </form>
+    {% endif %}
+
+    <a href="{% url 'event_list' %}">Back to Event List</a>
+</body>
+</html>
